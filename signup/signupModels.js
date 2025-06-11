@@ -11,10 +11,10 @@ class UserModel {
         });
     }
 
-    static updateProfile({ email_id, dob, ph_no, address }) {
+    static updateProfile({ email_id, dob, ph_no, address, avatar }) {
         return new Promise((resolve, reject) => {
-            const query = 'UPDATE users SET dob = ?, ph_no = ?, address = ? WHERE email_id = ?';
-            db.query(query, [dob, ph_no, address, email_id], (err, results) => {
+            const query = 'UPDATE users SET dob = ?, ph_no = ?, address = ?, avatar = ? WHERE email_id = ?';
+            db.query(query, [dob, ph_no, address, avatar, email_id], (err, results) => {
                 if (err) return reject(err);
                 resolve(results);
             });

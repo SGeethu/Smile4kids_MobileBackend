@@ -21,12 +21,12 @@ class SignupController {
     }
 
     async updateProfile(req, res) {
-        const { email_id, dob, ph_no, address } = req.body;
+        const { email_id, dob, ph_no, address, avatar } = req.body;
         if (!email_id) {
             return res.status(400).json({ message: 'Email is required' });
         }
         try {
-            await UserModel.updateProfile({ email_id, dob, ph_no, address });
+            await UserModel.updateProfile({ email_id, dob, ph_no, address, avatar });
             return res.json({ message: 'Profile updated successfully' });
         } catch (error) {
             return res.status(500).json({ message: 'Error updating profile', error: error.message });
