@@ -1,0 +1,30 @@
+# Node modules
+node_modules/
+
+# Dependency lock files
+package-lock.json
+yarn.lock
+
+# Logs
+logs/
+*.log
+
+# Environment variables
+.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build output
+dist/
+build/
+
+# Video files and folders
+*.mp4
+*.avi
+*.mov
+*.wmv
+*.flv
+*.mkv
+videos/

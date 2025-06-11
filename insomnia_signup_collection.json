@@ -1,0 +1,252 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2025-06-03T00:00:00.000Z",
+  "__export_source": "insomnia.desktop.app:v2024.2.0",
+  "resources": [
+    {
+      "_id": "wrk_signup_api",
+      "name": "Signup & Auth API",
+      "_type": "workspace"
+    },
+    {
+      "_id": "req_signup_user",
+      "parentId": "wrk_signup_api",
+      "name": "Step 1: Signup User",
+      "description": "Register a new user.",
+      "method": "POST",
+      "url": "http://localhost:3000/signup",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"username\": \"testuser\",\n  \"email_id\": \"test@example.com\",\n  \"password\": \"password123\",\n  \"confirm_password\": \"password123\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "_type": "request"
+    },
+    {
+      "_id": "req_update_profile",
+      "parentId": "wrk_signup_api",
+      "name": "Step 1b: Update Profile",
+      "description": "Update user profile after signup.",
+      "method": "POST",
+      "url": "http://localhost:3000/signup/update-profile",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email_id\": \"test@example.com\",\n  \"dob\": \"2000-01-01\",\n  \"ph_no\": \"1234567890\",\n  \"address\": \"123 Main St\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "_type": "request"
+    },
+    {
+      "_id": "req_login_user",
+      "parentId": "wrk_signup_api",
+      "name": "Step 2: Login User",
+      "description": "Login with email and password.",
+      "method": "POST",
+      "url": "http://localhost:3000/login",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email_id\": \"test@example.com\",\n  \"password\": \"password123\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "_type": "request"
+    },
+    {
+      "_id": "req_forgot_send_otp",
+      "parentId": "wrk_signup_api",
+      "name": "Forgot Step 1: Send OTP",
+      "description": "Send OTP to user's email for password reset.",
+      "method": "POST",
+      "url": "http://localhost:3000/forgot/send-otp",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email_id\": \"test@example.com\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "_type": "request"
+    },
+    {
+      "_id": "req_forgot_verify_otp",
+      "parentId": "wrk_signup_api",
+      "name": "Forgot Step 2: Verify OTP",
+      "description": "Verify the OTP sent to user's email.",
+      "method": "POST",
+      "url": "http://localhost:3000/forgot/verify-otp",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email_id\": \"test@example.com\",\n  \"otp\": \"123456\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "_type": "request"
+    },
+    {
+      "_id": "req_forgot_reset_password",
+      "parentId": "wrk_signup_api",
+      "name": "Forgot Step 3: Reset Password",
+      "description": "Reset password after OTP verification.",
+      "method": "POST",
+      "url": "http://localhost:3000/forgot/reset-password",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email_id\": \"test@example.com\",\n  \"otp\": \"123456\",\n  \"new_password\": \"newpassword123\",\n  \"confirm_password\": \"newpassword123\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "_type": "request"
+    },
+    {
+      "_id": "req_video_upload",
+      "parentId": "wrk_signup_api",
+      "name": "Video Upload",
+      "description": "Upload a video file by language and level.",
+      "method": "POST",
+      "url": "http://localhost:3000/videos/upload",
+      "body": {
+        "mimeType": "multipart/form-data",
+        "params": [
+          {
+            "name": "video",
+            "type": "file",
+            "fileName": "/path/to/your/video.mp4"
+          },
+          {
+            "name": "language",
+            "value": "Panjabi"
+          },
+          {
+            "name": "level",
+            "value": "Junior"
+          }
+        ]
+      },
+      "parameters": [],
+      "headers": [],
+      "_type": "request"
+    },
+    {
+      "_id": "req_video_list_by_category",
+      "parentId": "wrk_signup_api",
+      "name": "Get Videos by Language & Level",
+      "description": "Get videos for a specific language and level (e.g., Panjabi Junior or Panjabi Pre-Junior).",
+      "method": "GET",
+      "url": "http://localhost:3000/videos/by-category?language=Panjabi&level=Junior",
+      "parameters": [],
+      "headers": [],
+      "_type": "request"
+    },
+    {
+      "_id": "req_change_password",
+      "parentId": "wrk_signup_api",
+      "name": "Change Password",
+      "description": "Change password for a user.",
+      "method": "POST",
+      "url": "http://localhost:3000/forgot/change-password",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email_id\": \"test@example.com\",\n  \"current_password\": \"oldpassword123\",\n  \"new_password\": \"newpassword123\",\n  \"confirm_password\": \"newpassword123\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "_type": "request"
+    },
+    {
+      "_id": "req_get_profile",
+      "parentId": "wrk_signup_api",
+      "name": "Get User Profile",
+      "description": "Fetch user profile by email.",
+      "method": "GET",
+      "url": "http://localhost:3000/signup/profile?email_id=test@example.com",
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "_type": "request"
+    },
+    {
+      "_id": "req_get_all_images",
+      "parentId": "wrk_signup_api",
+      "name": "Get All Images",
+      "description": "Fetch all uploaded images.",
+      "method": "GET",
+      "url": "http://localhost:3000/api/images/",
+      "parameters": [],
+      "headers": [],
+      "_type": "request"
+    },
+    {
+      "_id": "req_get_image_by_id",
+      "parentId": "wrk_signup_api",
+      "name": "Get Image By ID",
+      "description": "Fetch a single image by its ID.",
+      "method": "GET",
+      "url": "http://localhost:3000/api/images/1",
+      "parameters": [],
+      "headers": [],
+      "_type": "request"
+    },
+    {
+      "_id": "req_upload_image",
+      "parentId": "wrk_signup_api",
+      "name": "Upload Image",
+      "description": "Upload an image file.",
+      "method": "POST",
+      "url": "http://localhost:3000/api/images/upload",
+      "body": {
+        "mimeType": "multipart/form-data",
+        "params": [
+          {
+            "name": "image",
+            "type": "file",
+            "fileName": "/path/to/your/image.jpg"
+          }
+        ]
+      },
+      "parameters": [],
+      "headers": [],
+      "_type": "request"
+    }
+  ]
+}
