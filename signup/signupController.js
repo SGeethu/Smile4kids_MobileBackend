@@ -16,10 +16,10 @@ class SignupController {
             const newUser = await UserModel.create({ username, email_id, password, confirm_password });
             return res.status(201).json({ message: 'User created successfully', user: newUser });
         } catch (error) {
-            console.error("Signup error:", error); // Add this
+            console.error("Error in signup:", error); // Updated log message
             return res.status(500).json({
                 message: 'Error creating user',
-                error: error.message || error.toString()
+                error: error.message || String(error)
             });
         }
     }
