@@ -16,7 +16,11 @@ class SignupController {
             const newUser = await UserModel.create({ username, email_id, password, confirm_password });
             return res.status(201).json({ message: 'User created successfully', user: newUser });
         } catch (error) {
-            return res.status(500).json({ message: 'Error creating user', error: error.message });
+            console.error("Signup error:", error); // Add this
+            return res.status(500).json({
+                message: 'Error creating user',
+                error: error.message || error.toString()
+            });
         }
     }
 
@@ -29,7 +33,11 @@ class SignupController {
             await UserModel.updateProfile({ email_id, dob, ph_no, address, avatar });
             return res.json({ message: 'Profile updated successfully' });
         } catch (error) {
-            return res.status(500).json({ message: 'Error updating profile', error: error.message });
+            console.error("Update profile error:", error); // Add this
+            return res.status(500).json({
+                message: 'Error updating profile',
+                error: error.message || error.toString()
+            });
         }
     }
 
@@ -47,7 +55,11 @@ class SignupController {
             const { password, confirm_password, ...profile } = user;
             res.json(profile);
         } catch (error) {
-            res.status(500).json({ message: 'Error fetching profile', error: error.message });
+            console.error("Get profile error:", error); // Add this
+            res.status(500).json({
+                message: 'Error fetching profile',
+                error: error.message || error.toString()
+            });
         }
     }
 }
