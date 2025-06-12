@@ -68,9 +68,9 @@ class ForgotController {
         return res.status(400).json({ message: 'Invalid OTP' });
       }
 
-      // Do not allow old password to be reused
+      // Check if new password is same as current password
       if (user.password === new_password) {
-        return res.status(400).json({ message: 'New password must be different from the old password' });
+        return res.status(400).json({ message: 'New password must be different from the current password' });
       }
 
       // Check new password match
