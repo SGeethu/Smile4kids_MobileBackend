@@ -50,9 +50,9 @@ class ForgotController {
   }
 
   async resetPassword(req, res) {
-    const { email_id, otp, current_password, new_password, confirm_password } = req.body;
+    const { email_id, otp, new_password, confirm_password } = req.body;
 
-    if (!email_id || !otp || !current_password || !new_password || !confirm_password) {
+    if (!email_id || !otp || !new_password || !confirm_password) {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
@@ -68,9 +68,9 @@ class ForgotController {
         return res.status(400).json({ message: 'Invalid OTP' });
       }
 
-      // Check current password
-      if (user.password !== current_password) {
-        return res.status(401).json({ message: 'Current password is incorrect' });
+      // Do not allow old password to be reused
+      if (user.password === new_password) {
+        return res.status(400).json({ message: 'New password must be different from the old password' });
       }
 
       // Check new password match
