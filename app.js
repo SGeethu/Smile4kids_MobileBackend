@@ -10,14 +10,14 @@ const forgotRoutes = require('./forgot/forgotRoutes');
 const uploadRoutes = require('./uploadvideo/uploadRoutes');
 const imageRoutes = require('./image/imageRoutes');
 
-
 const app = express();
 app.use(express.json());
 app.use(cors());
 
+// Request logging
 app.use((req, res, next) => {
-  const logEntry = `[${new Date().toISOString()}] ${req.method} ${req.originalUrl}\n`;
-  console.log(logEntry.trim());
+  const logEntry = `[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`;
+  console.log(logEntry);
   next();
 });
 
@@ -40,9 +40,6 @@ app.use((req, res, next) => {
   });
   next();
 });
-
-// Serve videos statically
-app.use('/videos', express.static(path.join(__dirname, 'videos')));
 
 // Serve uploaded files statically
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -92,7 +89,7 @@ app.get('/stream/:language/:level/:filename', (req, res) => {
   }
 });
 
-// Error handling middleware (add before app.listen)
+// Error handling middleware (should be after all routes)
 app.use((err, req, res, next) => {
   console.error('Unhandled error:', err);
   res.status(500).json({ message: 'Internal server error', error: err.message });

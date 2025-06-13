@@ -1,12 +1,11 @@
 const express = require('express');
-const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const multer = require('multer');
 const VideoModel = require('./videoModel');
-
 const router = express.Router();
 
-// Configure multer storage for both video and thumbnail
+// Multer storage setup (directly in this file)
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     let uploadPath;
@@ -17,7 +16,6 @@ const storage = multer.diskStorage({
     } else {
       return cb(new Error('Invalid field name'), null);
     }
-    // Ensure the directory exists
     fs.mkdirSync(uploadPath, { recursive: true });
     cb(null, uploadPath);
   },
@@ -27,27 +25,30 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// Live upload endpoint (accepts both video and thumbnail)
+// ==========================
+// POST /upload - Upload video + thumbnail
+// ==========================
 router.post('/upload', upload.fields([
   { name: 'video', maxCount: 1 },
   { name: 'thumbnail', maxCount: 1 }
 ]), async (req, res) => {
-  // Validate required fields
-  const { language, level, title, description } = req.body;
-  if (!language || !level) {
-    return res.status(400).json({ message: 'Language and level are required' });
-  }
-  if (!req.files || !req.files['video']) {
-    return res.status(400).json({ message: 'No video file uploaded' });
-  }
-
-  const videoFile = req.files['video'][0];
-  const thumbnailFile = req.files['thumbnail'] ? req.files['thumbnail'][0] : null;
-
-  const videoPath = `uploads/videos/${videoFile.filename}`;
-  const thumbnailPath = thumbnailFile ? `uploads/thumbnails/${thumbnailFile.filename}` : '';
-
   try {
+    const { language, level, title, description } = req.body;
+
+    if (!language || !level) {
+      return res.status(400).json({ message: 'Language and level are required' });
+    }
+
+    const videoFile = req.files?.video?.[0];
+    const thumbnailFile = req.files?.thumbnail?.[0];
+
+    if (!videoFile) {
+      return res.status(400).json({ message: 'No video file uploaded' });
+    }
+
+    const videoPath = path.join('uploads/videos', videoFile.filename);
+    const thumbnailPath = thumbnailFile ? path.join('uploads/thumbnails', thumbnailFile.filename) : null;
+
     const videoId = await VideoModel.save({
       filename: videoFile.filename,
       language,
@@ -59,23 +60,29 @@ router.post('/upload', upload.fields([
     });
 
     const baseUrl = `${req.protocol}://${req.get('host')}`;
-    res.json({
+
+    res.status(200).json({
       _id: videoId,
       title: title || videoFile.originalname,
       videoUrl: `${baseUrl}/${videoPath.replace(/\\/g, '/')}`,
       thumbnailUrl: thumbnailPath ? `${baseUrl}/${thumbnailPath.replace(/\\/g, '/')}` : null,
       description: description || ''
     });
+
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: 'Database error', error: err.message });
   }
 });
 
-// List all videos endpoint (for frontend to fetch)
+// ==========================
+// GET /list - Get all uploaded videos
+// ==========================
 router.get('/list', async (req, res) => {
   try {
     const videos = await VideoModel.getAll();
     const baseUrl = `${req.protocol}://${req.get('host')}`;
+
     const videosWithUrl = videos.map(video => ({
       _id: video.id,
       title: video.title || video.filename,
@@ -85,8 +92,10 @@ router.get('/list', async (req, res) => {
         : null,
       description: video.description || ''
     }));
-    res.json(videosWithUrl);
+
+    res.status(200).json(videosWithUrl);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: 'Database error', error: err.message });
   }
 });
