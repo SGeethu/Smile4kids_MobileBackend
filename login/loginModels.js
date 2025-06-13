@@ -1,4 +1,4 @@
-const db = require('../setup');
+const db = require('../db');
 
 class LoginModel {
   static findByEmail(email_id) {

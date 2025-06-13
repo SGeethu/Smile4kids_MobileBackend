@@ -1,4 +1,4 @@
-const db = require('../setup');
+const db = require('../db');
 
 class VideoModel {
   static save({ filename, language, level, path }) {
