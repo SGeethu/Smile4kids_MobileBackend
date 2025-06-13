@@ -1,4 +1,4 @@
-const db = require('../db');
+const db = require('../setup');
 
 class UserModel {
     static create({ username, email_id, password, confirm_password, dob = null, ph_no = null, address = null }) {
