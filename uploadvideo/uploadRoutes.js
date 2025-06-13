@@ -1,82 +1,85 @@
 const express = require('express');
 const multer = require('multer');
-const fs = require('fs');
 const path = require('path');
 const VideoModel = require('./videoModel');
 
 const router = express.Router();
 
-// Multer setup
+// Configure multer storage for both video and thumbnail
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    const { language, level } = req.query;
-    if (!language || !level) {
-      return cb(new Error('Language and level are required'), null);
+  destination: (req, file, cb) => {
+    if (file.fieldname === 'video') {
+      cb(null, path.join(__dirname, '../uploads/videos'));
+    } else if (file.fieldname === 'thumbnail') {
+      cb(null, path.join(__dirname, '../uploads/thumbnails'));
+    } else {
+      cb(new Error('Invalid field name'), null);
     }
-    const uploadPath = path.join(__dirname, '..', 'videos', language, level);
-    fs.mkdirSync(uploadPath, { recursive: true });
-    cb(null, uploadPath);
   },
-  filename: function (req, file, cb) {
+  filename: (req, file, cb) => {
     cb(null, Date.now() + '-' + file.originalname);
   }
 });
-
 const upload = multer({ storage });
 
-// Upload endpoint
-router.post('/upload', upload.single('video'), async (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ message: 'No file uploaded' });
+// Live upload endpoint (accepts both video and thumbnail)
+router.post('/upload', upload.fields([
+  { name: 'video', maxCount: 1 },
+  { name: 'thumbnail', maxCount: 1 }
+]), async (req, res) => {
+  // Validate required fields
+  const { language, level, title, description } = req.body;
+  if (!language || !level) {
+    return res.status(400).json({ message: 'Language and level are required' });
+  }
+  if (!req.files || !req.files['video']) {
+    return res.status(400).json({ message: 'No video file uploaded' });
   }
 
-  const { language, level } = req.query;
-  const filePath = path.join('videos', language, level, req.file.filename);
+  const videoFile = req.files['video'][0];
+  const thumbnailFile = req.files['thumbnail'] ? req.files['thumbnail'][0] : null;
+
+  const videoPath = `uploads/videos/${videoFile.filename}`;
+  const thumbnailPath = thumbnailFile ? `uploads/thumbnails/${thumbnailFile.filename}` : '';
 
   try {
-    await VideoModel.save({
-      filename: req.file.filename,
+    const videoId = await VideoModel.save({
+      filename: videoFile.filename,
       language,
       level,
-      path: filePath
+      path: videoPath,
+      title: title || videoFile.originalname,
+      description: description || '',
+      thumbnailUrl: thumbnailPath
     });
 
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
     res.json({
-      message: 'Video uploaded and saved to database successfully',
-      file: req.file,
-      path: filePath
+      _id: videoId,
+      title: title || videoFile.originalname,
+      videoUrl: `${baseUrl}/${videoPath.replace(/\\/g, '/')}`,
+      thumbnailUrl: thumbnailPath ? `${baseUrl}/${thumbnailPath.replace(/\\/g, '/')}` : null,
+      description: description || ''
     });
   } catch (err) {
     res.status(500).json({ message: 'Database error', error: err.message });
   }
 });
 
-// Get all videos
+// List all videos endpoint (for frontend to fetch)
 router.get('/list', async (req, res) => {
   try {
     const videos = await VideoModel.getAll();
-    res.json(videos);
-  } catch (err) {
-    res.status(500).json({ message: 'Database error', error: err.message });
-  }
-});
-
-// Get videos by language and level
-router.get('/by-category', async (req, res) => {
-  const { language, level } = req.query;
-  if (!language || !level) {
-    return res.status(400).json({ message: 'language and level are required as query parameters' });
-  }
-
-  try {
-    const videos = await VideoModel.getByCategory(language, level);
     const baseUrl = `${req.protocol}://${req.get('host')}`;
-
     const videosWithUrl = videos.map(video => ({
-      ...video,
-      url: `${baseUrl}/${video.path.replace(/\\/g, '/')}` // normalize slashes
+      _id: video.id,
+      title: video.title || video.filename,
+      videoUrl: `${baseUrl}/${video.path.replace(/\\/g, '/')}`,
+      thumbnailUrl: video.thumbnailUrl
+        ? (video.thumbnailUrl.startsWith('http') ? video.thumbnailUrl : `${baseUrl}/${video.thumbnailUrl.replace(/\\/g, '/')}`)
+        : null,
+      description: video.description || ''
     }));
-
     res.json(videosWithUrl);
   } catch (err) {
     res.status(500).json({ message: 'Database error', error: err.message });

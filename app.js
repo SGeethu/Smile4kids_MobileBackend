@@ -44,6 +44,9 @@ app.use((req, res, next) => {
 // Serve videos statically
 app.use('/videos', express.static(path.join(__dirname, 'videos')));
 
+// Serve uploaded files statically
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // Register routes
 app.use('/signup', signupRoutes);
 app.use('/login', loginRoutes);
