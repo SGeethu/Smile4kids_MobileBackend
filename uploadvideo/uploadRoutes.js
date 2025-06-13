@@ -1,6 +1,7 @@
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 const VideoModel = require('./videoModel');
 
 const router = express.Router();
@@ -8,13 +9,17 @@ const router = express.Router();
 // Configure multer storage for both video and thumbnail
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
+    let uploadPath;
     if (file.fieldname === 'video') {
-      cb(null, path.join(__dirname, '../uploads/videos'));
+      uploadPath = path.join(__dirname, '../uploads/videos');
     } else if (file.fieldname === 'thumbnail') {
-      cb(null, path.join(__dirname, '../uploads/thumbnails'));
+      uploadPath = path.join(__dirname, '../uploads/thumbnails');
     } else {
-      cb(new Error('Invalid field name'), null);
+      return cb(new Error('Invalid field name'), null);
     }
+    // Ensure the directory exists
+    fs.mkdirSync(uploadPath, { recursive: true });
+    cb(null, uploadPath);
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + '-' + file.originalname);
