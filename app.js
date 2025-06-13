@@ -4,34 +4,40 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 
-const signupRoutes = require('./signup/signupRoutes'); 
+// Route imports
+const signupRoutes = require('./signup/signupRoutes');
 const loginRoutes = require('./login/loginRoutes');
 const forgotRoutes = require('./forgot/forgotRoutes');
 const uploadRoutes = require('./uploadvideo/uploadRoutes');
 const imageRoutes = require('./image/imageRoutes');
 
 const app = express();
-app.use(express.json());
 app.use(cors());
+app.use(express.json());
 
-// Request logging
+// Serve static files
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// ==========================
+// Middleware: Logging
+// ==========================
 app.use((req, res, next) => {
   const logEntry = `[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`;
   console.log(logEntry);
   next();
 });
 
-// Log all JSON responses to the terminal
+// Middleware: Log JSON response
 app.use((req, res, next) => {
   const oldJson = res.json;
   res.json = function (data) {
-    console.log("Response data:", data);
+    console.log('Response data:', data);
     oldJson.call(this, data);
   };
   next();
 });
 
-// Request timing middleware
+// Middleware: Request timing
 app.use((req, res, next) => {
   req._startTime = Date.now();
   res.on('finish', () => {
@@ -41,20 +47,21 @@ app.use((req, res, next) => {
   next();
 });
 
-// Serve uploaded files statically
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-// Register routes
+// ==========================
+// Routes
+// ==========================
 app.use('/signup', signupRoutes);
 app.use('/login', loginRoutes);
 app.use('/forgot', forgotRoutes);
 app.use('/videos', uploadRoutes);
 app.use('/api/images', imageRoutes);
 
-// Optional: Streaming route for large video files
+// ==========================
+// Video Streaming Route
+// ==========================
 app.get('/stream/:language/:level/:filename', (req, res) => {
   const { language, level, filename } = req.params;
-  const filePath = path.join(__dirname, 'videos', language, level, filename);
+  const filePath = path.join(__dirname, 'uploads', 'videos', filename);
 
   try {
     const stat = fs.statSync(filePath);
@@ -85,18 +92,23 @@ app.get('/stream/:language/:level/:filename', (req, res) => {
       fs.createReadStream(filePath).pipe(res);
     }
   } catch (err) {
+    console.error(err);
     res.status(404).json({ error: 'Video not found' });
   }
 });
 
-// Error handling middleware (should be after all routes)
+// ==========================
+// Global Error Handler
+// ==========================
 app.use((err, req, res, next) => {
   console.error('Unhandled error:', err);
   res.status(500).json({ message: 'Internal server error', error: err.message });
 });
 
-// Start server
+// ==========================
+// Start Server
+// ==========================
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`✅ Server running on port ${PORT}`);
 });
