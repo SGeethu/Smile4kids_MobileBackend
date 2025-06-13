@@ -31,6 +31,16 @@ app.use((req, res, next) => {
   next();
 });
 
+// Request timing middleware
+app.use((req, res, next) => {
+  req._startTime = Date.now();
+  res.on('finish', () => {
+    const duration = Date.now() - req._startTime;
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl} - ${res.statusCode} - ${duration}ms`);
+  });
+  next();
+});
+
 // Serve videos statically
 app.use('/videos', express.static(path.join(__dirname, 'videos')));
 
@@ -77,6 +87,12 @@ app.get('/stream/:language/:level/:filename', (req, res) => {
   } catch (err) {
     res.status(404).json({ error: 'Video not found' });
   }
+});
+
+// Error handling middleware (add before app.listen)
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', err);
+  res.status(500).json({ message: 'Internal server error', error: err.message });
 });
 
 // Start server

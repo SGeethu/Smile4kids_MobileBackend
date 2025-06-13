@@ -11,18 +11,17 @@ class SignupController {
         if (password !== confirm_password) {
             return res.status(400).json({ message: 'Passwords do not match' });
         }
-
-        try {
-            const newUser = await UserModel.create({ username, email_id, password, confirm_password });
-            return res.status(201).json({ message: 'User created successfully', user: newUser });
-        } catch (error) {
-            console.error("Error in signup:", error); // Updated log message
-            return res.status(500).json({
-                message: 'Error creating user',
-                error: error.message || String(error)
-            });
-        }
+try {
+    const user = await UserModel.create(req.body);
+    res.status(201).json({ message: 'User created successfully', user });
+  } catch (err) {
+    if (err.code === 'ER_DUP_ENTRY') {
+      // Duplicate username or email
+      return res.status(409).json({ message: 'Username or email already exists' });
     }
+    next(err); // Pass other errors to error handler
+  }
+}
 
     async updateProfile(req, res) {
         const { email_id, dob, ph_no, address, avatar } = req.body;

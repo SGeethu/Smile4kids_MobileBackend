@@ -1,34 +1,22 @@
 const db = require('../db');
 
 class UserModel {
-    static create({ username, email_id, password, confirm_password, dob = null, ph_no = null, address = null }) {
-        return new Promise((resolve, reject) => {
-            const query = 'INSERT INTO users (username, email_id, password, confirm_password, dob, ph_no, address) VALUES (?, ?, ?, ?, ?, ?, ?)';
-            db.query(query, [username, email_id, password, confirm_password, dob, ph_no, address], (err, results) => {
-                if (err) return reject(err);
-                resolve({ id: results.insertId, username, email_id, dob, ph_no, address });
-            });
-        });
+    static async create({ username, email_id, password, confirm_password, dob = null, ph_no = null, address = null }) {
+        const query = 'INSERT INTO users (username, email_id, password, confirm_password, dob, ph_no, address) VALUES (?, ?, ?, ?, ?, ?, ?)';
+        const [results] = await db.query(query, [username, email_id, password, confirm_password, dob, ph_no, address]);
+        return { id: results.insertId, username, email_id, dob, ph_no, address };
     }
 
-    static updateProfile({ email_id, dob, ph_no, address, avatar }) {
-        return new Promise((resolve, reject) => {
-            const query = 'UPDATE users SET dob = ?, ph_no = ?, address = ?, avatar = ? WHERE email_id = ?';
-            db.query(query, [dob, ph_no, address, avatar, email_id], (err, results) => {
-                if (err) return reject(err);
-                resolve(results);
-            });
-        });
+    static async updateProfile({ email_id, dob, ph_no, address, avatar }) {
+        const query = 'UPDATE users SET dob = ?, ph_no = ?, address = ?, avatar = ? WHERE email_id = ?';
+        const [results] = await db.query(query, [dob, ph_no, address, avatar, email_id]);
+        return results;
     }
 
-    static findByEmail(email_id) {
-        return new Promise((resolve, reject) => {
-            const query = 'SELECT * FROM users WHERE email_id = ?';
-            db.query(query, [email_id], (err, results) => {
-                if (err) return reject(err);
-                resolve(results[0]);
-            });
-        });
+    static async findByEmail(email_id) {
+        const query = 'SELECT * FROM users WHERE email_id = ?';
+        const [results] = await db.query(query, [email_id]);
+        return results[0];
     }
 }
 module.exports = UserModel;
