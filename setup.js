@@ -1,14 +1,14 @@
 require('dotenv').config();
-const mysql = require('mysql2');
-const connection = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  port: process.env.DB_PORT
-});
+const mysql = require('mysql2/promise'); // Use promise API
 
 async function main() {
+  const connection = await mysql.createConnection({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    port: process.env.DB_PORT
+  });
+
   // Create database if not exists
   await connection.query(`CREATE DATABASE IF NOT EXISTS mobile_backend`);
   await connection.query(`USE mobile_backend`);

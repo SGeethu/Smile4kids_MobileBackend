@@ -1,6 +1,5 @@
 require('dotenv').config();
-const mysql = require('mysql2');
-const util = require('util');
+const mysql = require('mysql2/promise'); // Use promise API
 
 const pool = mysql.createPool({
   host: process.env.DB_HOST,
@@ -11,9 +10,6 @@ const pool = mysql.createPool({
   connectionLimit: 10,
   queueLimit: 0
 });
-
-// Optional: Promisify for async/await usage
-pool.query = util.promisify(pool.query);
 
 // Log every query (for debugging)
 pool.on('connection', (connection) => {
@@ -69,7 +65,7 @@ async function initializeDatabase() {
   `);
 
   // Seed images table if empty
-  const rows = await pool.query('SELECT COUNT(*) as count FROM images');
+  const [rows] = await pool.query('SELECT COUNT(*) as count FROM images');
   if (rows[0].count === 0) {
     await pool.query(`
       INSERT INTO images (path) VALUES
