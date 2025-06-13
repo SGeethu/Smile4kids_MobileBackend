@@ -1,44 +1,28 @@
 const db = require('../db');
 
 class ForgotModel {
-  static findByEmail(email_id) {
-    return new Promise((resolve, reject) => {
-      db.query('SELECT * FROM users WHERE email_id = ?', [email_id], (err, results) => {
-        if (err) return reject(err);
-        resolve(results[0]);
-      });
-    });
+  static async findByEmail(email_id) {
+    const [rows] = await db.query('SELECT * FROM users WHERE email_id = ?', [email_id]);
+    return rows[0];
   }
 
-  static saveOTP(email_id, otp) {
-    return new Promise((resolve, reject) => {
-      db.query('UPDATE users SET otp = ? WHERE email_id = ?', [otp, email_id], (err, results) => {
-        if (err) return reject(err);
-        resolve(results);
-      });
-    });
+  static async saveOTP(email_id, otp) {
+    const [results] = await db.query('UPDATE users SET otp = ? WHERE email_id = ?', [otp, email_id]);
+    return results;
   }
 
-  static verifyOTP(email_id, otp) {
-    return new Promise((resolve, reject) => {
-      db.query('SELECT * FROM users WHERE email_id = ? AND otp = ?', [email_id, otp], (err, results) => {
-        if (err) return reject(err);
-        resolve(results[0]);
-      });
-    });
+  static async verifyOTP(email_id, otp) {
+    const [rows] = await db.query('SELECT * FROM users WHERE email_id = ? AND otp = ?', [email_id, otp]);
+    return rows[0];
   }
 
-static updatePassword(email_id, new_password) {
-  return new Promise((resolve, reject) => {
-    db.query(
+  static async updatePassword(email_id, new_password) {
+    const [results] = await db.query(
       'UPDATE users SET password = ?, confirm_password = ?, otp = NULL WHERE email_id = ?',
-      [new_password, new_password, email_id],
-      (err, results) => {
-        if (err) return reject(err);
-        resolve(results);
-      }
+      [new_password, new_password, email_id]
     );
-  });
+    return results;
+  }
 }
-}
+
 module.exports = ForgotModel;
