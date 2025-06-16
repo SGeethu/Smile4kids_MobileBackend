@@ -158,4 +158,23 @@ router.get('/list/panjabi/junior', (req, res) => getVideosByCategory(req, res, '
 // Panjabi - Pre Junior
 router.get('/list/panjabi/prejunior', (req, res) => getVideosByCategory(req, res, 'Panjabi', 'pre junior'));
 
+// GET /videos/thumbnails - Get all video thumbnails
+router.get('/thumbnails', async (req, res) => {
+  try {
+    const videos = await VideoModel.getAll();
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const thumbnails = videos
+      .filter(video => video.thumbnailUrl)
+      .map(video => ({
+        _id: video.id,
+        thumbnailUrl: video.thumbnailUrl.startsWith('http')
+          ? video.thumbnailUrl
+          : `${baseUrl}/${video.thumbnailUrl.replace(/\\/g, '/')}`
+      }));
+    res.json(thumbnails);
+  } catch (err) {
+    res.status(500).json({ message: 'Database error', error: err.message });
+  }
+});
+
 module.exports = router;
