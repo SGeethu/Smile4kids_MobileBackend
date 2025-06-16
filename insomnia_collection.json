@@ -1,0 +1,178 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2025-06-16T00:00:00.000Z",
+  "__export_source": "insomnia.desktop.app:v2024.2.0",
+  "resources": [
+    {
+      "_id": "wrk_smil4kids",
+      "name": "Smil4kids_MobileBackend",
+      "_type": "workspace"
+    },
+    {
+      "_id": "req_signup",
+      "parentId": "wrk_smil4kids",
+      "name": "Signup",
+      "method": "POST",
+      "url": "http://localhost:3000/signup",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\"username\": \"testuser\", \"email_id\": \"test@example.com\", \"password\": \"test123\", \"confirm_password\": \"test123\"}"
+      },
+      "_type": "request"
+    },
+    {
+      "_id": "req_login",
+      "parentId": "wrk_smil4kids",
+      "name": "Login",
+      "method": "POST",
+      "url": "http://localhost:3000/login",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\"email_id\": \"test@example.com\", \"password\": \"test123\"}"
+      },
+      "_type": "request"
+    },
+    {
+      "_id": "req_forgot_send_otp",
+      "parentId": "wrk_smil4kids",
+      "name": "Forgot - Send OTP",
+      "method": "POST",
+      "url": "http://localhost:3000/forgot/send-otp",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\"email_id\": \"test@example.com\"}"
+      },
+      "_type": "request"
+    },
+    {
+      "_id": "req_forgot_verify_otp",
+      "parentId": "wrk_smil4kids",
+      "name": "Forgot - Verify OTP",
+      "method": "POST",
+      "url": "http://localhost:3000/forgot/verify-otp",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\"email_id\": \"test@example.com\", \"otp\": \"123456\"}"
+      },
+      "_type": "request"
+    },
+    {
+      "_id": "req_forgot_reset_password",
+      "parentId": "wrk_smil4kids",
+      "name": "Forgot - Reset Password",
+      "method": "POST",
+      "url": "http://localhost:3000/forgot/reset-password",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\"email_id\": \"test@example.com\", \"otp\": \"123456\", \"new_password\": \"newpass123\", \"confirm_password\": \"newpass123\"}"
+      },
+      "_type": "request"
+    },
+    {
+      "_id": "req_forgot_change_password",
+      "parentId": "wrk_smil4kids",
+      "name": "Forgot - Change Password",
+      "method": "POST",
+      "url": "http://localhost:3000/forgot/change-password",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\"current_password\": \"test123\", \"new_password\": \"newpass123\", \"confirm_password\": \"newpass123\"}"
+      },
+      "_type": "request"
+    },
+    {
+      "_id": "req_signup_update_profile",
+      "parentId": "wrk_smil4kids",
+      "name": "Signup - Update Profile",
+      "method": "POST",
+      "url": "http://localhost:3000/signup/update-profile",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\"email_id\": \"test@example.com\", \"dob\": \"2000-01-01\", \"ph_no\": \"1234567890\", \"address\": \"Test Address\", \"avatar\": \"avatar.png\"}"
+      },
+      "_type": "request"
+    },
+    {
+      "_id": "req_signup_get_profile",
+      "parentId": "wrk_smil4kids",
+      "name": "Signup - Get Profile",
+      "method": "GET",
+      "url": "http://localhost:3000/signup/profile?email_id=test@example.com",
+      "_type": "request"
+    },
+    {
+      "_id": "req_video_upload",
+      "parentId": "wrk_smil4kids",
+      "name": "Video Upload",
+      "method": "POST",
+      "url": "http://localhost:3000/videos/upload",
+      "body": {
+        "mimeType": "multipart/form-data",
+        "params": [
+          { "name": "video", "type": "file", "fileName": "/path/to/your/video.mp4" },
+          { "name": "thumbnail", "type": "file", "fileName": "/path/to/your/thumbnail.png" },
+          { "name": "language", "value": "Gujarati" },
+          { "name": "level", "value": "Junior" },
+          { "name": "title", "value": "Colors Gujarati" },
+          { "name": "description", "value": "Gujarati Junior - learning video" }
+        ]
+      },
+      "_type": "request"
+    },
+    {
+      "_id": "req_video_list_all",
+      "parentId": "wrk_smil4kids",
+      "name": "Get All Videos",
+      "method": "GET",
+      "url": "http://localhost:3000/videos/list",
+      "_type": "request"
+    },
+    {
+      "_id": "req_video_by_category",
+      "parentId": "wrk_smil4kids",
+      "name": "Get Videos by Category",
+      "method": "GET",
+      "url": "http://localhost:3000/videos/by-category?language=Gujarati&level=Junior",
+      "_type": "request"
+    },
+    {
+      "_id": "req_video_list_gujarati_junior",
+      "parentId": "wrk_smil4kids",
+      "name": "Gujarati Junior Videos",
+      "method": "GET",
+      "url": "http://localhost:3000/videos/list/gujarati/junior",
+      "_type": "request"
+    },
+    {
+      "_id": "req_video_list_panjabi_junior",
+      "parentId": "wrk_smil4kids",
+      "name": "Panjabi Junior Videos",
+      "method": "GET",
+      "url": "http://localhost:3000/videos/list/panjabi/junior",
+      "_type": "request"
+    },
+    {
+      "_id": "req_image_upload",
+      "parentId": "wrk_smil4kids",
+      "name": "Image Upload",
+      "method": "POST",
+      "url": "http://localhost:3000/api/images/upload",
+      "body": {
+        "mimeType": "multipart/form-data",
+        "params": [
+          { "name": "image", "type": "file", "fileName": "/path/to/your/image.png" }
+        ]
+      },
+      "_type": "request"
+    },
+    {
+      "_id": "req_image_list",
+      "parentId": "wrk_smil4kids",
+      "name": "Get All Images",
+      "method": "GET",
+      "url": "http://localhost:3000/api/images",
+      "_type": "request"
+    }
+  ]
+}
