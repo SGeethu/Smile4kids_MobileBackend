@@ -5,9 +5,7 @@ const multer = require('multer');
 const VideoModel = require('./videoModel');
 const router = express.Router();
 
-// ==========================
 // Multer Storage Configuration
-// ==========================
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     let uploadPath;
@@ -30,9 +28,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// ==========================
 // POST /upload
-// ==========================
 router.post('/upload', upload.fields([
   { name: 'video', maxCount: 1 },
   { name: 'thumbnail', maxCount: 1 }
@@ -75,9 +71,7 @@ router.post('/upload', upload.fields([
   }
 });
 
-// ==========================
 // GET /list - All videos
-// ==========================
 router.get('/list', async (req, res) => {
   try {
     const videos = await VideoModel.getAll();
@@ -99,9 +93,7 @@ router.get('/list', async (req, res) => {
   }
 });
 
-// ==========================
 // GET /by-category
-// ==========================
 router.get('/by-category', async (req, res) => {
   const { language, level } = req.query;
   if (!language || !level) {
