@@ -128,4 +128,42 @@ router.get('/by-category', async (req, res) => {
   }
 });
 
+// Helper function to get videos by language and level
+async function getVideosByCategory(req, res, language, level) {
+  try {
+    const videos = await VideoModel.getByCategory(language, level);
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const result = videos.map(video => ({
+      _id: video.id,
+      title: video.title || video.filename,
+      videoUrl: `${baseUrl}/${video.path.replace(/\\/g, '/')}`,
+      thumbnailUrl: video.thumbnailUrl
+        ? (video.thumbnailUrl.startsWith('http') ? video.thumbnailUrl : `${baseUrl}/${video.thumbnailUrl.replace(/\\/g, '/')}`)
+        : null,
+      description: video.description || ''
+    }));
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ message: 'Database error', error: err.message });
+  }
+}
+
+// Hindi - Junior
+router.get('/list/hindi/junior', (req, res) => getVideosByCategory(req, res, 'Hindi', 'junior'));
+
+// Hindi - Pre Junior
+router.get('/list/hindi/prejunior', (req, res) => getVideosByCategory(req, res, 'Hindi', 'pre junior'));
+
+// Gujarati - Junior
+router.get('/list/gujarati/junior', (req, res) => getVideosByCategory(req, res, 'Gujarati', 'junior'));
+
+// Gujarati - Pre Junior
+router.get('/list/gujarati/prejunior', (req, res) => getVideosByCategory(req, res, 'Gujarati', 'pre junior'));
+
+// Panjabi - Junior
+router.get('/list/panjabi/junior', (req, res) => getVideosByCategory(req, res, 'Panjabi', 'junior'));
+
+// Panjabi - Pre Junior
+router.get('/list/panjabi/prejunior', (req, res) => getVideosByCategory(req, res, 'Panjabi', 'pre junior'));
+
 module.exports = router;

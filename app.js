@@ -18,9 +18,7 @@ app.use(express.json());
 // Serve static files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// ==========================
 // Middleware: Logging
-// ==========================
 app.use((req, res, next) => {
   const logEntry = `[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`;
   console.log(logEntry);
@@ -47,18 +45,14 @@ app.use((req, res, next) => {
   next();
 });
 
-// ==========================
 // Routes
-// ==========================
 app.use('/signup', signupRoutes);
 app.use('/login', loginRoutes);
 app.use('/forgot', forgotRoutes);
 app.use('/videos', uploadRoutes);
 app.use('/api/images', imageRoutes);
 
-// ==========================
 // Video Streaming Route
-// ==========================
 app.get('/stream/:language/:level/:filename', (req, res) => {
   const { language, level, filename } = req.params;
   const filePath = path.join(__dirname, 'uploads', 'videos', filename);
@@ -97,17 +91,13 @@ app.get('/stream/:language/:level/:filename', (req, res) => {
   }
 });
 
-// ==========================
 // Global Error Handler
-// ==========================
 app.use((err, req, res, next) => {
   console.error('Unhandled error:', err);
   res.status(500).json({ message: 'Internal server error', error: err.message });
 });
 
-// ==========================
 // Start Server
-// ==========================
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
