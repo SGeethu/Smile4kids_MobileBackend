@@ -2,10 +2,12 @@ const UserModel = require('./signupModels');
 
 class SignupController {
     async createUser(req, res) {
+        if (!req.body) {
+            return res.status(400).json({ message: 'Missing request body' });
+        }
         const { username, email_id, password, confirm_password } = req.body;
-
         if (!username || !email_id || !password || !confirm_password) {
-            return res.status(400).json({ message: 'All fields are required' });
+            return res.status(400).json({ message: 'Missing required fields' });
         }
 
         if (password !== confirm_password) {

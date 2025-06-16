@@ -17,7 +17,7 @@
       "url": "http://localhost:3000/signup",
       "body": {
         "mimeType": "application/json",
-        "text": "{\"username\": \"testuser\", \"email_id\": \"test@example.com\", \"password\": \"test123\", \"confirm_password\": \"test123\"}"
+        "text": "{\"username\": \"testuser\", \"email_id\": \"test@example.com\", \"password\": \"123456\", \"confirm_password\": \"123456\"}"
       },
       "_type": "request"
     },
