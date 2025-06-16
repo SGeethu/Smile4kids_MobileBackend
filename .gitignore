@@ -27,3 +27,5 @@ build/
 *.flv
 *.mkv
 videos/
+
+uploads/thumbnails/
