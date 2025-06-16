@@ -133,7 +133,7 @@
       "_id": "req_video_upload",
       "parentId": "wrk_signup_api",
       "name": "Video Upload",
-      "description": "Upload a video file by language and level.",
+      "description": "Upload a video file and thumbnail by language and level.",
       "method": "POST",
       "url": "http://localhost:3000/videos/upload",
       "body": {
@@ -145,12 +145,25 @@
             "fileName": "/path/to/your/video.mp4"
           },
           {
+            "name": "thumbnail",
+            "type": "file",
+            "fileName": "/path/to/your/thumbnail.png"
+          },
+          {
             "name": "language",
-            "value": "Panjabi"
+            "value": "Gujarati"
           },
           {
             "name": "level",
-            "value": "Junior"
+            "value": "junior"
+          },
+          {
+            "name": "title",
+            "value": "Colors Gujarati"
+          },
+          {
+            "name": "description",
+            "value": "Gujarati Junior - learning video"
           }
         ]
       },
@@ -246,6 +259,54 @@
       },
       "parameters": [],
       "headers": [],
+      "_type": "request"
+    },
+    {
+      "_id": "req_list_hindi_junior",
+      "parentId": "wrk_signup_api",
+      "name": "Get Hindi Junior Videos",
+      "method": "GET",
+      "url": "http://localhost:3000/videos/list/hindi/junior",
+      "_type": "request"
+    },
+    {
+      "_id": "req_list_hindi_prejunior",
+      "parentId": "wrk_signup_api",
+      "name": "Get Hindi Pre Junior Videos",
+      "method": "GET",
+      "url": "http://localhost:3000/videos/list/hindi/prejunior",
+      "_type": "request"
+    },
+    {
+      "_id": "req_list_gujarati_junior",
+      "parentId": "wrk_signup_api",
+      "name": "Get Gujarati Junior Videos",
+      "method": "GET",
+      "url": "http://localhost:3000/videos/list/gujarati/junior",
+      "_type": "request"
+    },
+    {
+      "_id": "req_list_gujarati_prejunior",
+      "parentId": "wrk_signup_api",
+      "name": "Get Gujarati Pre Junior Videos",
+      "method": "GET",
+      "url": "http://localhost:3000/videos/list/gujarati/prejunior",
+      "_type": "request"
+    },
+    {
+      "_id": "req_list_panjabi_junior",
+      "parentId": "wrk_signup_api",
+      "name": "Get Panjabi Junior Videos",
+      "method": "GET",
+      "url": "http://localhost:3000/videos/list/panjabi/junior",
+      "_type": "request"
+    },
+    {
+      "_id": "req_list_panjabi_prejunior",
+      "parentId": "wrk_signup_api",
+      "name": "Get Panjabi Pre Junior Videos",
+      "method": "GET",
+      "url": "http://localhost:3000/videos/list/panjabi/prejunior",
       "_type": "request"
     }
   ]
