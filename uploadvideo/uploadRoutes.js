@@ -36,14 +36,66 @@ router.post('/upload', upload.fields([
       videoBufferStream.pipe(stream);
     });
 
-    res.json({
-      title: req.body.title,
-      videourl: result.secure_url, // This is the Cloudinary URL
-      thumbnailUrl: req.body.thumbnailUrl,
-      description: req.body.description
-    });
-  } catch (error) {
-    res.status(500).json({ message: 'Upload failed', error: error.message });
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ message: 'Database error', error: err.message });
+  }
+});
+
+// Helper function to get videos by language and level
+async function getVideosByCategory(req, res, language, level) {
+  try {
+    const videos = await VideoModel.getByCategory(language, level);
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const result = videos.map(video => ({
+      _id: video.id,
+      title: video.title || video.filename,
+      videoUrl: `${baseUrl}/${video.path.replace(/\\/g, '/')}`,
+      thumbnailUrl: video.thumbnailUrl
+        ? (video.thumbnailUrl.startsWith('http') ? video.thumbnailUrl : `${baseUrl}/${video.thumbnailUrl.replace(/\\/g, '/')}`)
+        : null,
+      description: video.description || ''
+    }));
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ message: 'Database error', error: err.message });
+  }
+}
+
+// Hindi - Junior
+router.get('/list/hindi/junior', (req, res) => getVideosByCategory(req, res, 'Hindi', 'junior'));
+
+// Hindi - Pre Junior
+router.get('/list/hindi/prejunior', (req, res) => getVideosByCategory(req, res, 'Hindi', 'pre junior'));
+
+// Gujarati - Junior
+router.get('/list/gujarati/junior', (req, res) => getVideosByCategory(req, res, 'Gujarati', 'junior'));
+
+// Gujarati - Pre Junior
+router.get('/list/gujarati/prejunior', (req, res) => getVideosByCategory(req, res, 'Gujarati', 'pre junior'));
+
+// Panjabi - Junior
+router.get('/list/panjabi/junior', (req, res) => getVideosByCategory(req, res, 'Panjabi', 'junior'));
+
+// Panjabi - Pre Junior
+router.get('/list/panjabi/prejunior', (req, res) => getVideosByCategory(req, res, 'Panjabi', 'pre junior'));
+
+// GET /videos/thumbnails - Get all video thumbnails
+router.get('/thumbnails', async (req, res) => {
+  try {
+    const videos = await VideoModel.getAll();
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const thumbnails = videos
+      .filter(video => video.thumbnailUrl)
+      .map(video => ({
+        _id: video.id,
+        thumbnailUrl: video.thumbnailUrl.startsWith('http')
+          ? video.thumbnailUrl
+          : `${baseUrl}/${video.thumbnailUrl.replace(/\\/g, '/')}`
+      }));
+    res.json(thumbnails);
+  } catch (err) {
+    res.status(500).json({ message: 'Database error', error: err.message });
   }
 });
 
