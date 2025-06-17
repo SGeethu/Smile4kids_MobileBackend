@@ -9,13 +9,21 @@ const router = express.Router();
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-router.post('/upload', upload.single('video'), async (req, res) => {
+router.post('/upload', upload.fields([
+  { name: 'video', maxCount: 1 },
+  { name: 'thumbnail', maxCount: 1 }
+]), async (req, res) => {
   try {
-    if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
+    if (!req.files || !req.files.video || !req.files.video[0]) {
+      return res.status(400).json({ message: 'No video file uploaded' });
+    }
 
-    const bufferStream = new Readable();
-    bufferStream.push(req.file.buffer);
-    bufferStream.push(null);
+    const videoFile = req.files.video[0];
+    const thumbnailFile = req.files.thumbnail ? req.files.thumbnail[0] : null;
+
+    const videoBufferStream = new Readable();
+    videoBufferStream.push(videoFile.buffer);
+    videoBufferStream.push(null);
 
     const result = await new Promise((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream(
@@ -25,7 +33,7 @@ router.post('/upload', upload.single('video'), async (req, res) => {
           resolve(result);
         }
       );
-      bufferStream.pipe(stream);
+      videoBufferStream.pipe(stream);
     });
 
     res.json({
