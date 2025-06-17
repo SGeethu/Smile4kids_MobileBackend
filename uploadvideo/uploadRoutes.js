@@ -1,40 +1,118 @@
 const express = require('express');
+const path = require('path');
+const fs = require('fs');
 const multer = require('multer');
-const { Readable } = require('stream');
-
-
+const VideoModel = require('./videoModel');
 const router = express.Router();
 
-// Multer in-memory storage
-const storage = multer.memoryStorage();
+// Multer Storage Configuration
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    let uploadPath;
+
+    if (file.fieldname === 'video') {
+      uploadPath = path.join(__dirname, '../uploads/videos');
+    } else if (file.fieldname === 'thumbnail') {
+      uploadPath = path.join(__dirname, '../uploads/thumbnails');
+    } else {
+      return cb(new Error('Invalid field name'), null);
+    }
+
+    fs.mkdirSync(uploadPath, { recursive: true });
+    cb(null, uploadPath);
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + '-' + file.originalname);
+  }
+});
+
 const upload = multer({ storage });
 
+// POST /upload
 router.post('/upload', upload.fields([
   { name: 'video', maxCount: 1 },
   { name: 'thumbnail', maxCount: 1 }
 ]), async (req, res) => {
   try {
-    if (!req.files || !req.files.video || !req.files.video[0]) {
-      return res.status(400).json({ message: 'No video file uploaded' });
+    const { language, level, title, description } = req.body;
+
+    const videoFile = req.files?.video?.[0];
+    const thumbnailFile = req.files?.thumbnail?.[0];
+
+    if (!language || !level || !videoFile) {
+      return res.status(400).json({ message: 'Language, level, and video are required' });
     }
 
-    const videoFile = req.files.video[0];
-    const thumbnailFile = req.files.thumbnail ? req.files.thumbnail[0] : null;
+    const videoPath = path.join('uploads/videos', videoFile.filename);
+    const thumbnailPath = thumbnailFile ? path.join('uploads/thumbnails', thumbnailFile.filename) : null;
 
-    const videoBufferStream = new Readable();
-    videoBufferStream.push(videoFile.buffer);
-    videoBufferStream.push(null);
-
-    const result = await new Promise((resolve, reject) => {
-      const stream = cloudinary.uploader.upload_stream(
-        { resource_type: 'video', folder: 'smile4kids_videos' },
-        (error, result) => {
-          if (error) return reject(error);
-          resolve(result);
-        }
-      );
-      videoBufferStream.pipe(stream);
+    const videoId = await VideoModel.save({
+      filename: videoFile.filename,
+      language,
+      level,
+      path: videoPath,
+      title: title || videoFile.originalname,
+      description: description || '',
+      thumbnailUrl: thumbnailPath
     });
+
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    res.status(200).json({
+      _id: videoId,
+      title: title || videoFile.originalname,
+      videoUrl: `${baseUrl}/${videoPath.replace(/\\/g, '/')}`,
+      thumbnailUrl: thumbnailPath ? `${baseUrl}/${thumbnailPath.replace(/\\/g, '/')}` : null,
+      description: description || ''
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Database error', error: err.message });
+  }
+});
+
+// GET /list - All videos
+router.get('/list', async (req, res) => {
+  try {
+    const videos = await VideoModel.getAll();
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+
+    const result = videos.map(video => ({
+      _id: video.id,
+      title: video.title || video.filename,
+      videoUrl: `${baseUrl}/${video.path.replace(/\\/g, '/')}`,
+      thumbnailUrl: video.thumbnailUrl
+        ? (video.thumbnailUrl.startsWith('http') ? video.thumbnailUrl : `${baseUrl}/${video.thumbnailUrl.replace(/\\/g, '/')}`)
+        : null,
+      description: video.description || ''
+    }));
+
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ message: 'Database error', error: err.message });
+  }
+});
+
+// GET /by-category
+router.get('/by-category', async (req, res) => {
+  const { language, level } = req.query;
+  if (!language || !level) {
+    return res.status(400).json({ message: 'language and level are required' });
+  }
+
+  try {
+    const videos = await VideoModel.getByCategory(language, level);
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+
+    const result = videos.map(video => ({
+      _id: video.id,
+      title: video.title || video.filename,
+      videoUrl: `${baseUrl}/${video.path.replace(/\\/g, '/')}`,
+      thumbnailUrl: video.thumbnailUrl
+        ? (video.thumbnailUrl.startsWith('http') ? video.thumbnailUrl : `${baseUrl}/${video.thumbnailUrl.replace(/\\/g, '/')}`)
+        : null,
+      description: video.description || ''
+    }));
 
     res.json(result);
   } catch (err) {
@@ -79,5 +157,24 @@ router.get('/list/panjabi/junior', (req, res) => getVideosByCategory(req, res, '
 
 // Panjabi - Pre Junior
 router.get('/list/panjabi/prejunior', (req, res) => getVideosByCategory(req, res, 'Panjabi', 'pre junior'));
+
+// GET /videos/thumbnails - Get all video thumbnails
+router.get('/thumbnails', async (req, res) => {
+  try {
+    const videos = await VideoModel.getAll();
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const thumbnails = videos
+      .filter(video => video.thumbnailUrl)
+      .map(video => ({
+        _id: video.id,
+        thumbnailUrl: video.thumbnailUrl.startsWith('http')
+          ? video.thumbnailUrl
+          : `${baseUrl}/${video.thumbnailUrl.replace(/\\/g, '/')}`
+      }));
+    res.json(thumbnails);
+  } catch (err) {
+    res.status(500).json({ message: 'Database error', error: err.message });
+  }
+});
 
 module.exports = router;
