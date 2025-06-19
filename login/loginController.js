@@ -18,11 +18,13 @@ class LoginController {
       }
 
       // Set token expiration based on rememberMe
-      const expiresIn = rememberMe ? '7d' : '1h';
       const token = jwt.sign(
-        { users_id: user.users_id, username: user.username, email_id: user.email_id },
-        process.env.JWT_SECRET,
-        { expiresIn }
+        {
+          users_id: user.users_id,
+          username: user.username,
+          email_id: user.email_id
+        },
+        process.env.JWT_SECRET
       );
 
       // If language and age are provided, update them
