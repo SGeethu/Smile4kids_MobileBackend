@@ -78,7 +78,9 @@ class LoginController {
         user: {
           users_id: user.users_id,
           username: user.username,
-          email_id: user.email_id
+          email_id: user.email_id,
+          language: user.language,
+          age: user.age
         }
       });
     } catch (err) {
