@@ -40,6 +40,22 @@ class LoginController {
       res.status(500).json({ message: 'Database error', error: err.message });
     }
   }
+
+  async getPreferences(req, res) {
+    try {
+      const users_id = req.user && req.user.users_id;
+      if (!users_id) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+      const prefs = await LoginModel.getPreferencesById(users_id);
+      if (!prefs) {
+        return res.status(404).json({ message: 'Preferences not found' });
+      }
+      res.json({ language: prefs.language, age: prefs.age });
+    } catch (err) {
+      res.status(500).json({ message: 'Error fetching preferences', error: err.message });
+    }
+  }
 }
 
 module.exports = new LoginController();
