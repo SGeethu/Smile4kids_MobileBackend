@@ -48,7 +48,7 @@ app.use((req, res, next) => {
 
 // Routes
 app.use('/signup', signupRoutes);
-app.use('/login', loginRoutes);
+app.use('/login', require('./login/loginRoutes'));
 app.use('/forgot', forgotRoutes);
 app.use('/videos', uploadRoutes);
 app.use('/api/images', imageRoutes);

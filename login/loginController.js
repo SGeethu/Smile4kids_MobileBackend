@@ -28,7 +28,7 @@ class LoginController {
 
       // If language and age are provided, update them
       if (language && age) {
-        await UserModel.updateLanguageAndAge({ users_id: user.users_id, language, age });
+        await LoginModel.updateLanguageAndAge({ users_id: user.users_id, language, age });
       }
 
       res.json({
