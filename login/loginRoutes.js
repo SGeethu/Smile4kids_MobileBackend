@@ -6,6 +6,7 @@ const authMiddleware = require('../authMiddleware');
 const router = express.Router();
 
 router.post('/', loginController.login);
+router.post('/with-preferences', loginController.loginWithPreferences);
 router.get('/preferences', authMiddleware, loginController.getPreferences);
 router.post('/set-preferences', authMiddleware, loginController.setPreferences);
 
