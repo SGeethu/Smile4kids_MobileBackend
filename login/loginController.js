@@ -2,8 +2,7 @@ const LoginModel = require('./loginModels');
 const jwt = require('jsonwebtoken');
 
 class LoginController {
-  // Login and set preferences in one API
-  async loginWithPreferences(req, res) {
+  async login(req, res) {
     const { email_id, password, rememberMe, language, age } = req.body;
     if (!email_id || !password) {
       return res.status(400).json({ message: 'Email and password are required' });
@@ -121,5 +120,15 @@ class LoginController {
       res.status(500).json({ message: 'Database error', error: err.message });
     }
   }
+    async getPreferencesById(req, res) {
+    const users_id = req.params.userId;
+    // (Optional: Add admin check here)
+    const prefs = await LoginModel.getPreferencesById(users_id);
+    if (!prefs) {
+      return res.status(404).json({ message: 'Preferences not found' });
+    }
+    res.json({ language: prefs.language, age: prefs.age });
+  }
 }
+
 module.exports = new LoginController();
