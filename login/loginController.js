@@ -1,6 +1,8 @@
 const LoginModel = require('./loginModels');
 const jwt = require('jsonwebtoken');
 
+const UserModel = require('../signup/signupModels');
+
 class LoginController {
   async login(req, res) {
     const { email_id, password, rememberMe } = req.body;
@@ -54,6 +56,24 @@ class LoginController {
       res.json({ language: prefs.language, age: prefs.age });
     } catch (err) {
       res.status(500).json({ message: 'Error fetching preferences', error: err.message });
+    }
+  }
+
+  // Set language and age preferences for a user
+  async setPreferences(req, res) {
+    try {
+      const users_id = req.user && req.user.users_id;
+      const { language, age } = req.body;
+      if (!users_id) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+      if (!language || !age) {
+        return res.status(400).json({ message: 'Language and age are required' });
+      }
+      await UserModel.updateLanguageAndAge({ users_id, language, age });
+      res.json({ message: 'Preferences updated successfully' });
+    } catch (err) {
+      res.status(500).json({ message: 'Error updating preferences', error: err.message });
     }
   }
 }
