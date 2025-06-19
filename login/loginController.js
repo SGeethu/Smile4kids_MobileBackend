@@ -103,6 +103,23 @@ class LoginController {
       res.status(500).json({ message: 'Error fetching preferences', error: err.message });
     }
   }
-}
 
+
+  async updatePreferences(req, res) {
+    const users_id = req.user && req.user.users_id;
+    const { language, age } = req.body;
+    if (!users_id) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+    if (!language || !age) {
+      return res.status(400).json({ message: 'Language and age are required' });
+    }
+    try {
+      await LoginModel.updateLanguageAndAge({ users_id, language, age });
+      res.json({ message: 'Preferences updated successfully' });
+    } catch (err) {
+      res.status(500).json({ message: 'Database error', error: err.message });
+    }
+  }
+}
 module.exports = new LoginController();
